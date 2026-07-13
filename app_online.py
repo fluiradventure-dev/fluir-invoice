@@ -18,8 +18,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("📄 Fluir Invoice Generator (Revisi Desain)")
-st.caption("Aplikasi pembuat invoice resmi CV Fluir Travelindo dengan format ringkas & tanda tangan.")
+st.title("📄 Fluir Invoice Generator (Revisi Tata Letak)")
+st.caption("Aplikasi pembuat invoice resmi CV Fluir Travelindo dengan penataan posisi sejajar.")
 st.markdown("---")
 
 # Sidebar Configuration
@@ -97,7 +97,6 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             
         event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
         
-        # Stempel Lunas Otomatis (opsional di samping tabel finansial utama)
         if remaining_payment == 0:
             status_badge_html = """
             <div style='border: 3px solid #27ae60; color: #27ae60; display: inline-block; 
@@ -125,15 +124,14 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                 .section-title {{ font-size: 8pt; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 5px; letter-spacing: 0.5px; }}
                 table.items {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; }}
                 table.items th {{ background-color: #f8f9fa; color: #34495e; padding: 10px; font-size: 9pt; text-transform: uppercase; border-bottom: 2px solid #bdc3c7; }}
-                .split-container {{ width: 100%; overflow: hidden; margin-top: 15px; }}
-                .left-block {{ float: left; width: 55%; }}
-                .right-block {{ float: right; width: 42%; }}
+                .split-container {{ width: 100%; overflow: hidden; margin-top: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eaeded; }}
+                .right-block {{ float: right; width: 42%; text-align: right; }}
                 .summary-table {{ width: 100%; border-collapse: collapse; }}
                 .summary-table td {{ padding: 7px 10px; border-bottom: 1px solid #f2f4f4; font-size: 10pt; }}
                 .notes-list {{ padding-left: 15px; margin: 5px 0 0 0; font-size: 8.5pt; color: #626567; }}
                 .notes-list li {{ margin-bottom: 3px; }}
-                .signature-section {{ width: 100%; margin-top: 50px; border-collapse: collapse; page-break-inside: avoid; }}
-                .signature-cell {{ width: 50%; vertical-align: top; font-size: 10pt; }}
+                .bottom-layout-table {{ width: 100%; margin-top: 40px; border-collapse: collapse; page-break-inside: avoid; }}
+                .bottom-layout-cell {{ width: 50%; vertical-align: top; font-size: 10pt; }}
             </style>
         </head>
         <body onload="window.print()">
@@ -145,92 +143,4 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                         JL. Situ Cileunca No24 Pangalengan<br>
                         Bandung Jawa barat 40378<br>
                         NPWP: 91.570.415.9-404.000<br>
-                        Hub: 081386000797 | fluiradventure@gmail.com
-                    </td>
-                </tr>
-            </table>
-            
-            <table class='info-table'>
-                <tr>
-                    <td class='info-cell'>
-                        <div class='section-title'>Dituju Kepada</div>
-                        <b>{client_name}</b><br>
-                        {client_phone}<br>
-                        {client_address}
-                    </td>
-                    <td class='info-cell' style='text-align: right;'>
-                        <div class='section-title'>Data Dokumen</div>
-                        <b>Invoice #</b> {inv_number}<br>
-                        <b>Tanggal:</b> {inv_date.strftime('%B %d, %Y')}<br>
-                        {event_info_html}
-                    </td>
-                </tr>
-            </table>
-
-            <table class='items'>
-                <thead>
-                    <tr>
-                        <th style='text-align: left; width: 50%;'>Deskripsi</th>
-                        <th style='width: 15%; text-align: center;'>Kuantitas</th>
-                        <th style='width: 17%; text-align: right;'>Harga</th>
-                        <th style='width: 18%; text-align: right;'>Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows_html}
-                </tbody>
-            </table>
-
-            <div class='split-container'>
-                <div class='left-block'>
-                    <div class='section-title'>Instruksi Pembayaran</div>
-                    <div style='font-size: 9pt; color: #2c3e50; margin-bottom: 12px;'>
-                        Bank Transfer: <b>BCA 7380549926</b> A/N Muhammad Hanif Padma<br>
-                        Metode Lain: <b>Qris</b>
-                    </div>
-                    
-                    <div class='section-title'>Catatan Penting</div>
-                    <ul class='notes-list'>
-                        <li>Pembayaran yang telah dilakukan tidak dapat Dibatalkan / Dikembalikan.</li>
-                        <li>Pastikan invoice sesuai dengan harga & jumlah peserta yang didaftarkan.</li>
-                        <li>Pelunasan pembayaran Dilakukan H-7 Kegiatan.</li>
-                        <li>Pembayaran Melalui Bank transfer.</li>
-                        <li>Mohon lampirkan bukti pembayaran melalui Email/WhatsApp kami.</li>
-                    </ul>
-                </div>
-                
-                <div class='right-block' style='text-align: right;'>
-                    <table class='summary-table'>
-                        <tr><td style='text-align: left; color:#7f8c8d;'>Subtotal</td><td style='text-align: right;'>Rp{subtotal:,}</td></tr>
-                        <tr><td style='text-align: left; color:#7f8c8d;'>Sudah Dibayar</td><td style='text-align: right; color: #27ae60;'>Rp{dp_paid:,}</td></tr>
-                        <tr style='font-weight: bold; background-color: #fcfcfc;'>
-                            <td style='text-align: left; border-top: 1px solid #34495e;'>Sisa Pembayaran</td>
-                            <td style='text-align: right; color: #c0392b; border-top: 1px solid #34495e;'>Rp{remaining_payment:,}</td>
-                        </tr>
-                    </table>
-                    {status_badge_html}
-                </div>
-            </div>
-
-            <table class='signature-section'>
-                <tr>
-                    <td class='signature-cell'></td>
-                    <td class='signature-cell' style='text-align: right; padding-right: 30px;'>
-                        <p style='margin-bottom: 60px; font-weight: 500;'>Hormat kami,</p>
-                        <b style='color: #2c3e50; font-size: 10.5pt;'>Hanif Padma</b>
-                    </td>
-                </tr>
-            </table>
-        </body>
-        </html>
-        """.replace(",", ".")
-        
-        b64 = base64.b64encode(html_doc.encode('utf-8')).decode()
-        st.success("🎉 Invoice Berhasil Diperbarui Sesuai Revisi Gambar!")
-        st.markdown(f'''
-            <a href="data:text/html;base64,{b64}" download="Invoice_{inv_number}_{client_name.replace(' ', '_')}.html" style="text-decoration:none;">
-                <button style="width:100%; padding:14px; background-color:#e67e22; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11pt;">
-                    📥 DOWNLOAD INVOICE HASIL REVISI
-                </button>
-            </a>
-        ''', unsafe_allow_html=True)
+                        Hub: 0813
