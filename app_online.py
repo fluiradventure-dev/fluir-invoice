@@ -25,12 +25,16 @@ st.markdown("---")
 # Sidebar Configuration
 st.sidebar.header("⚙️ Detail Invoice")
 inv_number = st.sidebar.text_input("Nomor Invoice (#)", "21872")
-inv_date = st.sidebar.date_input("Tanggal", datetime.today())
+inv_date = st.sidebar.date_input("Tanggal Invoice", datetime.today())
 
 st.sidebar.header("👤 Dituju Kepada")
 client_name = st.sidebar.text_input("Nama Pelanggan", "Teh Tari")
 client_phone = st.sidebar.text_input("Nomor Telepon", "0896-1741-4370")
 client_address = st.sidebar.text_area("Lokasi / Instansi", "Glamping lakeside")
+
+# BARU: Input Tanggal & Waktu Kegiatan di Sidebar
+st.sidebar.header("📅 Jadwal Event")
+event_date_time = st.sidebar.text_input("Tanggal & Waktu Kegiatan", placeholder="Contoh: 15 - 16 Mei 2026 (08:00 WIB)")
 
 # Main Form Items
 st.subheader("🛍️ Item Pesanan")
@@ -92,6 +96,9 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             </tr>
             """.replace(",", ".")
             
+        # Format teks jika input kegiatan kosong
+        event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
+            
         html_doc = f"""
         <!DOCTYPE html>
         <html>
@@ -101,7 +108,6 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             <style>
                 body {{ font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; }}
                 .hdr-table {{ width: 100%; margin-bottom: 25px; border-bottom: 2px solid #e67e22; padding-bottom: 15px; }}
-                .brand {{ font-size: 26pt; font-weight: bold; color: #e67e22; letter-spacing: 1px; }}
                 .company-details {{ font-size: 9pt; color: #7f8c8d; text-align: right; line-height: 1.3; }}
                 .info-table {{ width: 100%; margin-bottom: 25px; }}
                 .info-cell {{ vertical-align: top; width: 50%; }}
@@ -119,7 +125,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             </style>
         </head>
         <body onload="window.print()">
-            <!-- Header -->
+            <!-- Header (Logo Terintegrasi) -->
             <table class='hdr-table'>
                 <tr>
                     <td><img src="https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp" style="height: 55px;"></td>
@@ -145,7 +151,8 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                     <td class='info-cell' style='text-align: right;'>
                         <div class='section-title'>Data Dokumen</div>
                         <b>Invoice #</b> {inv_number}<br>
-                        <b>Tanggal:</b> {inv_date.strftime('%B %d, %Y')}
+                        <b>Tanggal:</b> {inv_date.strftime('%B %d, %Y')}<br>
+                        {event_info_html}
                     </td>
                 </tr>
             </table>
