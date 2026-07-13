@@ -122,7 +122,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             <!-- Header -->
             <table class='hdr-table'>
                 <tr>
-                    <td><div class='brand'>FLUIR</div></td>
+                    <td><img src="https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp" style="height: 55px;"></td>
                     <td class='company-details'>
                         <b>CV Fluir Travelindo</b><br>
                         JL. Situ Cileunca No24 Pangalengan<br>
