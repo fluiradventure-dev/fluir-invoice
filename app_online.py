@@ -109,7 +109,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
-        # Perbaikan f-string template agar terhindar dari bug unterminated literal
+        # Kode HTML yang sudah aman dari bentrokan kurung kurawal CSS (menggunakan {{ dan }})
         html_doc = f"""
         <!DOCTYPE html>
         <html>
@@ -197,4 +197,38 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             <table class='bottom-layout-table'>
                 <tr>
                     <td class='bottom-layout-cell' style='width: 60%; padding-right: 30px;'>
-                        <div class='
+                        <div class='section-title'>Instruksi Pembayaran</div>
+                        <div style='font-size: 9pt; color: #2c3e50; margin-bottom: 15px; line-height: 1.5;'>
+                            Bank Transfer: <b>BCA 7380549926</b> A/N Muhammad Hanif Padma<br>
+                            Metode Lain: <b>Qris</b>
+                        </div>
+                        
+                        <div class='section-title'>Catatan Penting</div>
+                        <ul class='notes-list'>
+                            <li>Pembayaran yang telah dilakukan tidak dapat Dibatalkan / Dikembalikan.</li>
+                            <li>Pastikan invoice sesuai dengan harga & jumlah peserta yang didaftarkan.</li>
+                            <li>Pelunasan pembayaran Dilakukan H-7 Kegiatan.</li>
+                            <li>Pembayaran Melalui Bank transfer.</li>
+                            <li>Mohon lampirkan bukti pembayaran melalui Email/WhatsApp kami.</li>
+                        </ul>
+                    </td>
+                    
+                    <td class='bottom-layout-cell' style='width: 40%; text-align: right; padding-right: 20px; vertical-align: top;'>
+                        <p style='margin-top: 0; margin-bottom: 65px; font-weight: 500;'>Hormat kami,</p>
+                        <b style='color: #2c3e50; font-size: 10.5pt;'>Hanif Padma</b>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """.replace(",", ".")
+        
+        b64 = base64.b64encode(html_doc.encode('utf-8')).decode()
+        st.success("🎉 Posisi Instruksi & Tanda Tangan Berhasil Disejajarkan!")
+        st.markdown(f'''
+            <a href="data:text/html;base64,{b64}" download="Invoice_{inv_number}_{client_name.replace(' ', '_')}.html" style="text-decoration:none;">
+                <button style="width:100%; padding:14px; background-color:#e67e22; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11pt;">
+                    📥 DOWNLOAD INVOICE TERBARU
+                </button>
+            </a>
+        ''', unsafe_allow_html=True)
