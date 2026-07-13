@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 import base64
 
 st.set_page_config(page_title="Fluir Billing System", layout="wide", page_icon="📄")
@@ -18,7 +18,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("📄 Fluir Invoice Generator (Revisi Tata Letak)")
+st.title("📄 Fluir Invoice Generator")
 st.caption("Aplikasi pembuat invoice resmi CV Fluir Travelindo dengan penataan posisi sejajar.")
 st.markdown("---")
 
@@ -109,6 +109,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
+        # Perbaikan f-string template agar terhindar dari bug unterminated literal
         html_doc = f"""
         <!DOCTYPE html>
         <html>
@@ -143,4 +144,57 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                         JL. Situ Cileunca No24 Pangalengan<br>
                         Bandung Jawa barat 40378<br>
                         NPWP: 91.570.415.9-404.000<br>
-                        Hub: 0813
+                        Hub: 081386000797 | fluiradventure@gmail.com
+                    </td>
+                </tr>
+            </table>
+            
+            <table class='info-table'>
+                <tr>
+                    <td class='info-cell'>
+                        <div class='section-title'>Dituju Kepada</div>
+                        <b>{client_name}</b><br>
+                        {client_phone}<br>
+                        {client_address}
+                    </td>
+                    <td class='info-cell' style='text-align: right;'>
+                        <div class='section-title'>Data Dokumen</div>
+                        <b>Invoice #</b> {inv_number}<br>
+                        <b>Tanggal:</b> {inv_date.strftime('%B %d, %Y')}<br>
+                        {event_info_html}
+                    </td>
+                </tr>
+            </table>
+
+            <table class='items'>
+                <thead>
+                    <tr>
+                        <th style='text-align: left; width: 50%;'>Deskripsi</th>
+                        <th style='width: 15%; text-align: center;'>Kuantitas</th>
+                        <th style='width: 17%; text-align: right;'>Harga</th>
+                        <th style='width: 18%; text-align: right;'>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows_html}
+                </tbody>
+            </table>
+
+            <div class='split-container'>
+                <div class='right-block'>
+                    <table class='summary-table'>
+                        <tr><td style='text-align: left; color:#7f8c8d;'>Subtotal</td><td style='text-align: right;'>Rp{subtotal:,}</td></tr>
+                        <tr><td style='text-align: left; color:#7f8c8d;'>Sudah Dibayar</td><td style='text-align: right; color: #27ae60;'>Rp{dp_paid:,}</td></tr>
+                        <tr style='font-weight: bold; background-color: #fcfcfc;'>
+                            <td style='text-align: left; border-top: 1px solid #34495e;'>Sisa Pembayaran</td>
+                            <td style='text-align: right; color: #c0392b; border-top: 1px solid #34495e;'>Rp{remaining_payment:,}</td>
+                        </tr>
+                    </table>
+                    {status_badge_html}
+                </div>
+            </div>
+
+            <table class='bottom-layout-table'>
+                <tr>
+                    <td class='bottom-layout-cell' style='width: 60%; padding-right: 30px;'>
+                        <div class='
