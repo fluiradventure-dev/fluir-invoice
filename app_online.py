@@ -18,8 +18,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("📄 Fluir Invoice Generator (Desain Baru)")
-st.caption("Aplikasi pembuat invoice dengan layout terstruktur sesuai standar CV Fluir Travelindo.")
+st.title("📄 Fluir Invoice Generator (Revisi Desain)")
+st.caption("Aplikasi pembuat invoice resmi CV Fluir Travelindo dengan format ringkas & tanda tangan.")
 st.markdown("---")
 
 # Sidebar Configuration
@@ -32,9 +32,8 @@ client_name = st.sidebar.text_input("Nama Pelanggan", "Teh Tari")
 client_phone = st.sidebar.text_input("Nomor Telepon", "0896-1741-4370")
 client_address = st.sidebar.text_area("Lokasi / Instansi", "Glamping lakeside")
 
-# BARU: Input Tanggal & Waktu Kegiatan di Sidebar
 st.sidebar.header("📅 Jadwal Event")
-event_date_time = st.sidebar.text_input("Tanggal & Waktu Kegiatan", placeholder="Contoh: 15 - 16 Mei 2026 (08:00 WIB)")
+event_date_time = st.sidebar.text_input("Tanggal & Waktu Kegiatan", value="15 - 16 Mei 2026 (08:00 WIB)")
 
 # Main Form Items
 st.subheader("🛍️ Item Pesanan")
@@ -74,7 +73,7 @@ if st.session_state.invoice_items:
 
 # Financial Summary Calculation
 subtotal = sum(item['qty'] * item['price'] for item in st.session_state.invoice_items)
-dp_paid = st.number_input("Sudah DP (Rp)", min_value=0, value=600000, step=50000)
+dp_paid = st.number_input("Sudah Di bayar / Masuk DP (Rp)", min_value=0, value=600000, step=50000)
 remaining_payment = max(0, subtotal - dp_paid)
 
 st.markdown("---")
@@ -96,8 +95,20 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             </tr>
             """.replace(",", ".")
             
-        # Format teks jika input kegiatan kosong
         event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
+        
+        # Stempel Lunas Otomatis (opsional di samping tabel finansial utama)
+        if remaining_payment == 0:
+            status_badge_html = """
+            <div style='border: 3px solid #27ae60; color: #27ae60; display: inline-block; 
+                        padding: 4px 12px; font-size: 13pt; font-weight: bold; 
+                        text-transform: uppercase; border-radius: 4px; margin-top: 15px; 
+                        letter-spacing: 1px; transform: rotate(-3deg); opacity: 0.85;'>
+                LUNAS / PAID
+            </div>
+            """
+        else:
+            status_badge_html = ""
             
         html_doc = f"""
         <!DOCTYPE html>
@@ -116,16 +127,16 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                 table.items th {{ background-color: #f8f9fa; color: #34495e; padding: 10px; font-size: 9pt; text-transform: uppercase; border-bottom: 2px solid #bdc3c7; }}
                 .split-container {{ width: 100%; overflow: hidden; margin-top: 15px; }}
                 .left-block {{ float: left; width: 55%; }}
-                .right-block {{ float: right; width: 40%; }}
+                .right-block {{ float: right; width: 42%; }}
                 .summary-table {{ width: 100%; border-collapse: collapse; }}
-                .summary-table td {{ padding: 6px 8px; border-bottom: 1px solid #f2f4f4; }}
-                .badge-container {{ background-color: #f4f6f7; padding: 12px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #e67e22; }}
+                .summary-table td {{ padding: 7px 10px; border-bottom: 1px solid #f2f4f4; font-size: 10pt; }}
                 .notes-list {{ padding-left: 15px; margin: 5px 0 0 0; font-size: 8.5pt; color: #626567; }}
                 .notes-list li {{ margin-bottom: 3px; }}
+                .signature-section {{ width: 100%; margin-top: 50px; border-collapse: collapse; page-break-inside: avoid; }}
+                .signature-cell {{ width: 50%; vertical-align: top; font-size: 10pt; }}
             </style>
         </head>
         <body onload="window.print()">
-            <!-- Header (Logo Terintegrasi) -->
             <table class='hdr-table'>
                 <tr>
                     <td><img src="https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp" style="height: 55px;"></td>
@@ -139,7 +150,6 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                 </tr>
             </table>
             
-            <!-- Metadata info -->
             <table class='info-table'>
                 <tr>
                     <td class='info-cell'>
@@ -157,7 +167,6 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                 </tr>
             </table>
 
-            <!-- Table items -->
             <table class='items'>
                 <thead>
                     <tr>
@@ -172,12 +181,10 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                 </tbody>
             </table>
 
-            <!-- Split bottom section -->
             <div class='split-container'>
-                <!-- Left Details (Payments & Notes) -->
                 <div class='left-block'>
                     <div class='section-title'>Instruksi Pembayaran</div>
-                    <div style='font-size: 9pt; color: #2c3e50; margin-bottom: 15px;'>
+                    <div style='font-size: 9pt; color: #2c3e50; margin-bottom: 12px;'>
                         Bank Transfer: <b>BCA 7380549926</b> A/N Muhammad Hanif Padma<br>
                         Metode Lain: <b>Qris</b>
                     </div>
@@ -192,32 +199,38 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
                     </ul>
                 </div>
                 
-                <!-- Right Details (Financial Status Block) -->
-                <div class='right-block'>
+                <div class='right-block' style='text-align: right;'>
                     <table class='summary-table'>
-                        <tr><td>Subtotal</td><td style='text-align: right;'>Rp{subtotal:,}</td></tr>
-                        <tr><td>Sudah DP</td><td style='text-align: right; color: #27ae60;'>Rp{dp_paid:,}</td></tr>
-                        <tr style='font-weight: bold;'><td>Sisa Pembayaran</td><td style='text-align: right; color: #c0392b;'>Rp{remaining_payment:,}</td></tr>
+                        <tr><td style='text-align: left; color:#7f8c8d;'>Subtotal</td><td style='text-align: right;'>Rp{subtotal:,}</td></tr>
+                        <tr><td style='text-align: left; color:#7f8c8d;'>Sudah Dibayar</td><td style='text-align: right; color: #27ae60;'>Rp{dp_paid:,}</td></tr>
+                        <tr style='font-weight: bold; background-color: #fcfcfc;'>
+                            <td style='text-align: left; border-top: 1px solid #34495e;'>Sisa Pembayaran</td>
+                            <td style='text-align: right; color: #c0392b; border-top: 1px solid #34495e;'>Rp{remaining_payment:,}</td>
+                        </tr>
                     </table>
-                    
-                    <div class='badge-container'>
-                        <div class='section-title' style='margin-bottom: 2px;'>Payment Received</div>
-                        <div style='font-size: 13pt; font-weight: bold; color: #27ae60;'>Rp{dp_paid:,}</div>
-                        <div class='section-title' style='margin-top: 8px; margin-bottom: 2px;'>Sisa Pembayaran</div>
-                        <div style='font-size: 13pt; font-weight: bold; color: #c0392b;'>Rp{remaining_payment:,}</div>
-                    </div>
+                    {status_badge_html}
                 </div>
             </div>
+
+            <table class='signature-section'>
+                <tr>
+                    <td class='signature-cell'></td>
+                    <td class='signature-cell' style='text-align: right; padding-right: 30px;'>
+                        <p style='margin-bottom: 60px; font-weight: 500;'>Hormat kami,</p>
+                        <b style='color: #2c3e50; font-size: 10.5pt;'>Hanif Padma</b>
+                    </td>
+                </tr>
+            </table>
         </body>
         </html>
         """.replace(",", ".")
         
         b64 = base64.b64encode(html_doc.encode('utf-8')).decode()
-        st.success("🎉 Tampilan Invoice CV Fluir Travelindo Berhasil Diperbarui!")
+        st.success("🎉 Invoice Berhasil Diperbarui Sesuai Revisi Gambar!")
         st.markdown(f'''
             <a href="data:text/html;base64,{b64}" download="Invoice_{inv_number}_{client_name.replace(' ', '_')}.html" style="text-decoration:none;">
                 <button style="width:100%; padding:14px; background-color:#e67e22; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11pt;">
-                    📥 DOWNLOAD & SIMPAN SEBAGAI PDF PREMIUM
+                    📥 DOWNLOAD INVOICE HASIL REVISI
                 </button>
             </a>
         ''', unsafe_allow_html=True)
