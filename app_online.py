@@ -98,9 +98,49 @@ if st.session_state.invoice_items:
 # Financial Summary Calculation
 subtotal = sum(item['qty'] * item['price'] for item in st.session_state.invoice_items)
 
-# Kolom DP Default 0 (Bisa dikosongkan)
+# Kolom DP Default 0 (Bisa dikosongkan/diisi 0)
 dp_paid = st.number_input("Sudah Dibayar / Masuk DP (Rp) - Isi 0 jika tanpa DP", min_value=0, value=0, step=50000)
 remaining_payment = max(0, subtotal - dp_paid)
 
+# Definisi format string rupiah secara aman
 subtotal_idr = f"Rp {subtotal:,.0f}".replace(",", ".")
-dp_paid_idr
+dp_paid_idr = f"Rp {dp_paid:,.0f}".replace(",", ".")
+remaining_payment_idr = f"Rp {remaining_payment:,.0f}".replace(",", ".")
+
+st.markdown("---")
+
+if 'invoice_ready' not in st.session_state:
+    st.session_state.invoice_ready = False
+if 'html_buffer' not in st.session_state:
+    st.session_state.html_buffer = ""
+
+if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
+    if not client_name:
+        st.error("❌ Nama Pelanggan wajib diisi sebelum mencetak!")
+    elif not st.session_state.invoice_items:
+        st.error("❌ Tabel item pesanan masih kosong!")
+    else:
+        try:
+            save_next_invoice_number(int(inv_number))
+        except:
+            pass
+
+        # Menyusun baris tabel tanpa f-string agar aman dari bentrokan tanda {}
+        rows_html = ""
+        row_template = """
+        <tr>
+            <td style='padding: 12px 10px; border-bottom: 1px solid #eaeded;'>[DESC]</td>
+            <td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: center;'>[QTY]</td>
+            <td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[PRICE]</td>
+            <td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[TOTAL]</td>
+        </tr>
+        """
+        
+        for item in st.session_state.invoice_items:
+            item_total = item['qty'] * item['price']
+            formatted_price = f"Rp {item['price']:,.0f}".replace(",", ".")
+            formatted_total = f"Rp {item_total:,.0f}".replace(",", ".")
+            
+            rows_html += row_template.replace("[DESC]", str(item['desc']))\
+                                      .replace("[QTY]", str(item['qty']))\
+                                      .replace("[PRICE]", formatted_price)\
