@@ -98,7 +98,7 @@ if st.session_state.invoice_items:
 # Financial Summary Calculation
 subtotal = sum(item['qty'] * item['price'] for item in st.session_state.invoice_items)
 
-# Kolom DP Default 0 (Bisa dikosongkan)
+# Kolom DP Default 0 (Bisa dikosongkan/diisi sesuka hati)
 dp_paid = st.number_input("Sudah Dibayar / Masuk DP (Rp) - Isi 0 jika tanpa DP", min_value=0, value=0, step=50000)
 remaining_payment = max(0, subtotal - dp_paid)
 
@@ -125,6 +125,27 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             pass
 
         rows_html = ""
-        row_template = """
-        <tr>
-            <td style='padding: 12px 1
+        # Solusi Aman: Menggunakan string satu baris lurus tanpa triple quotes agar bebas error indentasi
+        row_template = "<tr><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded;'>[DESC]</td><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: center;'>[QTY]</td><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[PRICE]</td><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[TOTAL]</td></tr>"
+        
+        for item in st.session_state.invoice_items:
+            item_total = item['qty'] * item['price']
+            formatted_price = f"Rp {item['price']:,.0f}".replace(",", ".")
+            formatted_total = f"Rp {item_total:,.0f}".replace(",", ".")
+            
+            rows_html += row_template.replace("[DESC]", str(item['desc'])).replace("[QTY]", str(item['qty'])).replace("[PRICE]", formatted_price).replace("[TOTAL]", formatted_total)
+            
+        event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
+        status_badge_html = "<div style='border: 3px solid #27ae60; color: #27ae60; display: inline-block; padding: 4px 12px; font-size: 13pt; font-weight: bold; text-transform: uppercase; border-radius: 4px; margin-top: 15px; letter-spacing: 1px; transform: rotate(-3deg); opacity: 0.85;'>LUNAS / PAID</div>" if remaining_payment == 0 else ""
+            
+        # Template HTML utama
+        html_template = """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Invoice #[INV_NUMBER]</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; }
+        .hdr-table { width: 100%; margin-bottom: 25px; border-bottom: 2px solid #e67e22; padding-bottom: 15px; }
+        .company-details { font-size: 9pt; color: #7f8c8d; text-align: right; line-height: 1.3; }
+        .info-table { width: 100%; margin-bottom: 25px; }
