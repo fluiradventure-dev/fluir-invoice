@@ -87,8 +87,8 @@ if st.session_state.invoice_items:
 # Financial Summary Calculation
 subtotal = sum(item['qty'] * item['price'] for item in st.session_state.invoice_items)
 
-# Kolom DP Pilihan
-dp_paid = st.number_input("Sudah Dibayar / Masuk DP (Rp) - Isi 0 jika tanpa DP", min_value=0, value=0, step=50000)
+# Teks Input diganti menjadi Down Payment
+dp_paid = st.number_input("Down Payment (Rp) - Isi 0 jika tanpa DP", min_value=0, value=0, step=50000)
 remaining_payment = max(0, subtotal - dp_paid)
 
 subtotal_idr = f"Rp {subtotal:,.0f}".replace(",", ".")
@@ -124,14 +124,13 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             
         event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
         
-        # PERBAIKAN STRATEGIS: Teks HTML lencana lunas dipecah pendek-pendek agar tidak terpotong editor GitHub
         badge_style = "border: 3px solid #27ae60; color: #27ae60; display: inline-block; padding: 4px 12px; "
         badge_style += "font-size: 13pt; font-weight: bold; text-transform: uppercase; border-radius: 4px; "
         badge_style += "margin-top: 15px; letter-spacing: 1px; transform: rotate(-3deg); opacity: 0.85;"
         
         status_badge_html = f"<div style='{badge_style}'>LUNAS / PAID</div>" if remaining_payment == 0 else ""
             
-        # Template HTML menggunakan kurung biasa
+        # Template HTML menggunakan kurung biasa (Tabel ringkasan diganti menjadi Down Payment)
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
@@ -165,7 +164,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             "<div class='split-container'><div class='right-block'>"
             "<table class='summary-table'>"
             "<tr><td style='text-align: left; color:#7f8c8d;'>Subtotal</td><td style='text-align: right;'>[SUBTOTAL]</td></tr>"
-            "<tr><td style='text-align: left; color:#7f8c8d;'>Sudah Dibayar</td><td style='text-align: right; color: #27ae60;'>[DP_PAID]</td></tr>"
+            "<tr><td style='text-align: left; color:#7f8c8d;'>Down Payment</td><td style='text-align: right; color: #27ae60;'>[DP_PAID]</td></tr>"
             "<tr style='font-weight: bold; background-color: #fcfcfc;'><td style='text-align: left; border-top: 1px solid #34495e;'>Sisa Pembayaran</td><td style='text-align: right; color: #c0392b; border-top: 1px solid #34495e;'>[REMAINING]</td></tr>"
             "</table>[STATUS_BADGE]"
             "</div></div>"
