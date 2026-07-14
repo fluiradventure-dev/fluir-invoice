@@ -85,7 +85,6 @@ if st.session_state.invoice_items:
     df['Jumlah'] = df['qty'] * df['price']
     
     df_render = df.copy()
-    # Format mata uang Indonesia yang aman untuk tabel Streamlit
     df_render['Harga'] = df_render['price'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
     df_render['Jumlah'] = df_render['Jumlah'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
     
@@ -101,14 +100,12 @@ subtotal = sum(item['qty'] * item['price'] for item in st.session_state.invoice_
 dp_paid = st.number_input("Sudah Di bayar / Masuk DP (Rp)", min_value=0, value=600000, step=50000)
 remaining_payment = max(0, subtotal - dp_paid)
 
-# Format Rupiah aman untuk teks & dokumen HTML
 subtotal_idr = f"Rp {subtotal:,.0f}".replace(",", ".")
 dp_paid_idr = f"Rp {dp_paid:,.0f}".replace(",", ".")
 remaining_payment_idr = f"Rp {remaining_payment:,.0f}".replace(",", ".")
 
 st.markdown("---")
 
-# Menggunakan session state agar tombol download stabil saat di-generate
 if 'invoice_ready' not in st.session_state:
     st.session_state.invoice_ready = False
 if 'html_buffer' not in st.session_state:
@@ -120,13 +117,11 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
     elif not st.session_state.invoice_items:
         st.error("❌ Tabel item pesanan masih kosong!")
     else:
-        # Simpan counter nomor baru (+1)
         try:
             save_next_invoice_number(int(inv_number))
         except:
             pass
 
-        # Build Rows HTML tanpa merusak kode CSS global
         rows_html = ""
         for item in st.session_state.invoice_items:
             item_total = item['qty'] * item['price']
@@ -143,7 +138,22 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             """
             
         event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
-        
-        if remaining_payment == 0:
-            status_badge_html = """
-            <div
+        status_badge_html = "<div style='border: 3px solid #27ae60; color: #27ae60; display: inline-block; padding: 4px 12px; font-size: 13pt; font-weight: bold; text-transform: uppercase; border-radius: 4px; margin-top: 15px; letter-spacing: 1px; transform: rotate(-3deg); opacity: 0.85;'>LUNAS / PAID</div>" if remaining_payment == 0 else ""
+            
+        st.session_state.html_buffer = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='utf-8'>
+            <title>Invoice #{inv_number}</title>
+            <style>
+                body {{ font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; }}
+                .hdr-table {{ width: 100%; margin-bottom: 25px; border-bottom: 2px solid #e67e22; padding-bottom: 15px; }}
+                .company-details {{ font-size: 9pt; color: #7f8c8d; text-align: right; line-height: 1.3; }}
+                .info-table {{ width: 100%; margin-bottom: 25px; }}
+                .info-cell {{ vertical-align: top; width: 50%; }}
+                .section-title {{ font-size: 8pt; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 5px; letter-spacing: 0.5px; }}
+                table.items {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; }}
+                table.items th {{ background-color: #f8f9fa; color: #34495e; padding: 10px; font-size: 9pt; text-transform: uppercase; border-bottom: 2px solid #bdc3c7; }}
+                .split-container {{ width: 100%; overflow: hidden; margin-top: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eaeded; }}
+                .right-block {{ float: right; width: 42%; text-align: right;
