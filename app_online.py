@@ -136,20 +136,20 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
-        # UPDATE STRUKTUR: Menggunakan kontainer pembungkus khusus untuk memposisikan logo ikon baru persis di tengah bawah tabel deskripsi
+        # MODIFIKASI POSISI: Nilai top diganti ke 190px agar bergeser agak ke atas mendekati tabel deskripsi
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
             "body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; position: relative; }"
-            ".content-wrapper { position: relative; width: 100%; }"
-            ".watermark-container { position: absolute; top: 220px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; z-index: -1000; pointer-events: none; }"
-            ".watermark { width: 420px; opacity: 0.07; }"
+            ".table-container { position: relative; width: 100%; margin-bottom: 20px; }"
+            ".watermark-container { position: absolute; top: 190px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; z-index: -1000; pointer-events: none; }"
+            ".watermark { width: 400px; opacity: 0.10; }"
             ".hdr-table { width: 100%; margin-bottom: 25px; border-bottom: 2px solid #e67e22; padding-bottom: 15px; }"
             ".company-details { font-size: 9pt; color: #7f8c8d; text-align: right; line-height: 1.3; }"
             ".info-table { width: 100%; margin-bottom: 25px; }"
             ".info-cell { vertical-align: top; width: 50%; }"
             ".section-title { font-size: 8pt; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 5px; letter-spacing: 0.5px; }"
-            "table.items { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: transparent; }"
+            "table.items { width: 100%; border-collapse: collapse; background: transparent; position: relative; z-index: 2; }"
             "table.items th { background-color: #f8f9fa; color: #34495e; padding: 10px; font-size: 9pt; text-transform: uppercase; border-bottom: 2px solid #bdc3c7; }"
             ".split-container { width: 100%; overflow: hidden; margin-top: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eaeded; position: relative; z-index: 10; }"
             ".right-block { float: right; width: 42%; text-align: right; }"
@@ -168,8 +168,8 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             "<td class='info-cell'><div class='section-title'>Dituju Kepada</div><b>[CLIENT_NAME]</b><br>[CLIENT_PHONE]<br>[CLIENT_ADDRESS]</td>"
             "<td class='info-cell' style='text-align: right;'><div class='section-title'>Data Dokumen</div><b>Invoice #</b> [INV_NUMBER]<br><b>Tanggal:</b> [INV_DATE]<br>[EVENT_INFO]</td>"
             "</tr></table>"
-            "<div class='content-wrapper'>"
-            "<div class='watermark-container'><img class='watermark' src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO.-06.png'></div>"
+            "<div class='table-container'>"
+            "<div class='watermark-container'><img class='watermark' src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO.-06.png' onerror=\"this.src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp'; this.style.opacity='0.05';\"></div>"
             "<table class='items'><thead><tr><th style='text-align: left; width: 50%;'>Deskripsi</th><th style='width: 15%; text-align: center;'>Kuantitas</th><th style='width: 17%; text-align: right;'>Harga</th><th style='width: 18%; text-align: right;'>Jumlah</th></tr></thead>"
             "<tbody>[ROWS_HTML]</tbody></table>"
             "</div>"
