@@ -48,7 +48,6 @@ client_address = st.sidebar.text_area("Lokasi / Instansi", "Glamping lakeside")
 st.sidebar.header("📅 Jadwal Event")
 event_date_time = st.sidebar.text_input("Tanggal & Waktu Kegiatan", value="15 - 16 Mei 2026 (08:00 WIB)")
 
-# FITUR BARU: Opsi Stempel Lunas Manual di Sidebar
 st.sidebar.header("🎨 Opsi Dokumen")
 manual_lunas = st.sidebar.checkbox("Pasang Stempel LUNAS", value=False)
 
@@ -128,7 +127,6 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             
         event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
         
-        # Pengaturan stempel lunas: muncul jika sisa bayar = 0 ATAU kotak centang sidebar diaktifkan
         badge_style = "border: 3px solid #27ae60; color: #27ae60; display: inline-block; padding: 4px 12px; "
         badge_style += "font-size: 13pt; font-weight: bold; text-transform: uppercase; border-radius: 4px; "
         badge_style += "margin-top: 15px; letter-spacing: 1px; transform: rotate(-3deg); opacity: 0.85;"
@@ -138,17 +136,18 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
-        # Template HTML menggunakan kurung biasa
+        # Template HTML menggunakan kurung biasa + FITUR BARU: Efek Embos/Watermark Logo Fluir di Tengah Halaman
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
-            "body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; }"
+            "body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; position: relative; }"
+            ".watermark { position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%); width: 380px; opacity: 0.07; z-index: -1000; pointer-events: none; }"
             ".hdr-table { width: 100%; margin-bottom: 25px; border-bottom: 2px solid #e67e22; padding-bottom: 15px; }"
             ".company-details { font-size: 9pt; color: #7f8c8d; text-align: right; line-height: 1.3; }"
             ".info-table { width: 100%; margin-bottom: 25px; }"
             ".info-cell { vertical-align: top; width: 50%; }"
             ".section-title { font-size: 8pt; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 5px; letter-spacing: 0.5px; }"
-            "table.items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }"
+            "table.items { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: transparent; }"
             "table.items th { background-color: #f8f9fa; color: #34495e; padding: 10px; font-size: 9pt; text-transform: uppercase; border-bottom: 2px solid #bdc3c7; }"
             ".split-container { width: 100%; overflow: hidden; margin-top: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eaeded; }"
             ".right-block { float: right; width: 42%; text-align: right; }"
@@ -159,6 +158,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             ".bottom-layout-table { width: 100%; margin-top: 40px; border-collapse: collapse; page-break-inside: avoid; }"
             ".bottom-layout-cell { width: 50%; vertical-align: top; font-size: 10pt; }"
             "</style></head><body onload='window.print()'>"
+            "<img class='watermark' src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp'>"
             "<table class='hdr-table'><tr>"
             "<td><img src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp' style='height: 55px;'></td>"
             "<td class='company-details'><b>CV Fluir Travelindo</b><br>JL. Situ Cileunca No24 Pangalengan<br>Bandung Jawa barat 40378<br>NPWP: 91.570.415.9-404.000<br>Hub: 081386000797 | fluiradventure@gmail.com</td>"
