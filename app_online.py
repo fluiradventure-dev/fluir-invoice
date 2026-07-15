@@ -48,6 +48,10 @@ client_address = st.sidebar.text_area("Lokasi / Instansi", "Glamping lakeside")
 st.sidebar.header("📅 Jadwal Event")
 event_date_time = st.sidebar.text_input("Tanggal & Waktu Kegiatan", value="15 - 16 Mei 2026 (08:00 WIB)")
 
+# FITUR BARU: Opsi Stempel Lunas Manual di Sidebar
+st.sidebar.header("🎨 Opsi Dokumen")
+manual_lunas = st.sidebar.checkbox("Pasang Stempel LUNAS", value=False)
+
 # Main Form Items
 st.subheader("🛍️ Item Pesanan")
 
@@ -87,7 +91,7 @@ if st.session_state.invoice_items:
 # Financial Summary Calculation
 subtotal = sum(item['qty'] * item['price'] for item in st.session_state.invoice_items)
 
-# Teks Input diganti menjadi Down Payment
+# Kolom Down Payment
 dp_paid = st.number_input("Down Payment (Rp) - Isi 0 jika tanpa DP", min_value=0, value=0, step=50000)
 remaining_payment = max(0, subtotal - dp_paid)
 
@@ -124,13 +128,17 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             
         event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
         
+        # Pengaturan stempel lunas: muncul jika sisa bayar = 0 ATAU kotak centang sidebar diaktifkan
         badge_style = "border: 3px solid #27ae60; color: #27ae60; display: inline-block; padding: 4px 12px; "
         badge_style += "font-size: 13pt; font-weight: bold; text-transform: uppercase; border-radius: 4px; "
         badge_style += "margin-top: 15px; letter-spacing: 1px; transform: rotate(-3deg); opacity: 0.85;"
         
-        status_badge_html = f"<div style='{badge_style}'>LUNAS / PAID</div>" if remaining_payment == 0 else ""
+        if remaining_payment == 0 or manual_lunas:
+            status_badge_html = f"<div style='{badge_style}'>LUNAS / PAID</div>"
+        else:
+            status_badge_html = ""
             
-        # Template HTML menggunakan kurung biasa (Tabel ringkasan diganti menjadi Down Payment)
+        # Template HTML menggunakan kurung biasa
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
