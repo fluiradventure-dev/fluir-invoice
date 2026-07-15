@@ -136,13 +136,13 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
-        # MODIFIKASI POSISI: Nilai top diganti ke 190px agar bergeser agak ke atas mendekati tabel deskripsi
+        # PENYESUAIAN POSISI: Nilai top diubah ke 150px agar logo bergeser lebih naik ke atas
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
             "body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; position: relative; }"
             ".table-container { position: relative; width: 100%; margin-bottom: 20px; }"
-            ".watermark-container { position: absolute; top: 190px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; z-index: -1000; pointer-events: none; }"
+            ".watermark-container { position: absolute; top: 150px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; z-index: -1000; pointer-events: none; }"
             ".watermark { width: 400px; opacity: 0.10; }"
             ".hdr-table { width: 100%; margin-bottom: 25px; border-bottom: 2px solid #e67e22; padding-bottom: 15px; }"
             ".company-details { font-size: 9pt; color: #7f8c8d; text-align: right; line-height: 1.3; }"
