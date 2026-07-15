@@ -136,12 +136,12 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
-        # Template HTML menggunakan kurung biasa + FITUR BARU: Efek Embos/Watermark Logo Fluir di Tengah Halaman
+        # PENYESUAIAN POSISI: top dinaikkan ke 52% & width dibatasi ke 350px agar pas di bawah deskripsi & aman dari potong margin A4
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
             "body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #2c3e50; padding: 25px; line-height: 1.4; font-size: 10pt; position: relative; }"
-            ".watermark { position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%); width: 380px; opacity: 0.07; z-index: -1000; pointer-events: none; }"
+            ".watermark { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); width: 350px; opacity: 0.07; z-index: -1000; pointer-events: none; }"
             ".hdr-table { width: 100%; margin-bottom: 25px; border-bottom: 2px solid #e67e22; padding-bottom: 15px; }"
             ".company-details { font-size: 9pt; color: #7f8c8d; text-align: right; line-height: 1.3; }"
             ".info-table { width: 100%; margin-bottom: 25px; }"
