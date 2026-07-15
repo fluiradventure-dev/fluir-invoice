@@ -136,7 +136,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
-        # PENYESUAIAN POSISI: top dinaikkan ke 52% & width dibatasi ke 350px agar pas di bawah deskripsi & aman dari potong margin A4
+        # PERBAIKAN: Kata 'Hub: ' resmi dihapus dari data profil perusahaan atas
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
@@ -161,7 +161,7 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             "<img class='watermark' src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp'>"
             "<table class='hdr-table'><tr>"
             "<td><img src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp' style='height: 55px;'></td>"
-            "<td class='company-details'><b>CV Fluir Travelindo</b><br>JL. Situ Cileunca No24 Pangalengan<br>Bandung Jawa barat 40378<br>NPWP: 91.570.415.9-404.000<br>Hub: 081386000797 | fluiradventure@gmail.com</td>"
+            "<td class='company-details'><b>CV Fluir Travelindo</b><br>JL. Situ Cileunca No24 Pangalengan<br>Bandung Jawa barat 40378<br>NPWP: 91.570.415.9-404.000<br>081386000797 | fluiradventure@gmail.com</td>"
             "</tr></table>"
             "<table class='info-table'><tr>"
             "<td class='info-cell'><div class='section-title'>Dituju Kepada</div><b>[CLIENT_NAME]</b><br>[CLIENT_PHONE]<br>[CLIENT_ADDRESS]</td>"
