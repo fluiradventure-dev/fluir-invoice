@@ -32,7 +32,7 @@ st.set_page_config(page_title="Fluir Billing System", layout="wide", page_icon="
 st.markdown("<style>.main .block-container { padding-top: 1.5rem; } div.stButton > button:first-child { background-color: #e67e22; color: white; border-radius: 6px; border: none; font-weight: bold; }</style>", unsafe_allow_html=True)
 
 st.title("📄 Fluir Invoice Generator")
-st.caption("Aplikasi pembuat invoice resmi CV Fluir Travelindo dengan penomoran otomatis bertambah +1.")
+st.caption("Aplikasi pembuat invoice resmi CV Fluir Travelindo dengan kolom Diskon dan penomoran otomatis.")
 st.markdown("---")
 
 # Sidebar Configuration
@@ -56,39 +56,46 @@ st.subheader("🛍️ Item Pesanan")
 
 if 'invoice_items' not in st.session_state:
     st.session_state.invoice_items = [
-        {"desc": "@Green Corner Pangalengan", "qty": 2, "price": 900000}
+        {"desc": "@Green Corner Pangalengan", "qty": 2, "price": 900000, "discount": 0}
     ]
 
 with st.expander("➕ Tambah Rincian Item Baru", expanded=False):
-    c1, c2 = st.columns([3, 1])
+    c1, c2 = st.columns([2, 1])
     with c1:
         new_desc = st.text_input("Deskripsi Item / Layanan", placeholder="Contoh: @Green Corner Pangalengan")
     with c2:
         new_qty = st.number_input("Kuantitas", min_value=1, value=1)
+        
+    c3, c4 = st.columns([1, 1])
+    with c3:
         new_price = st.number_input("Harga Satuan (Rp)", min_value=0, step=50000, value=500000)
+    with c4:
+        new_discount = st.number_input("Diskon per Item (Rp) - Isi 0 jika tidak ada", min_value=0, step=10000, value=0)
     
     if st.button("Tambahkan Item"):
         if new_desc:
-            st.session_state.invoice_items.append({"desc": new_desc, "qty": new_qty, "price": new_price})
+            st.session_state.invoice_items.append({"desc": new_desc, "qty": new_qty, "price": new_price, "discount": new_discount})
             st.rerun()
 
 if st.session_state.invoice_items:
     df = pd.DataFrame(st.session_state.invoice_items)
-    df['Jumlah'] = df['qty'] * df['price']
+    # Hitung jumlah setelah dikurangi diskon satuan
+    df['Jumlah'] = df['qty'] * (df['price'] - df['discount'])
     
     df_render = df.copy()
-    df_render['Harga'] = df_render['price'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+    df_render['Harga Asli'] = df_render['price'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
+    df_render['Potongan Diskon'] = df_render['discount'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
     df_render['Jumlah'] = df_render['Jumlah'].apply(lambda x: f"Rp {x:,.0f}".replace(",", "."))
     
-    df_render.columns = ['Deskripsi', 'Kuantitas', 'price', 'Harga', 'Jumlah']
-    st.table(df_render[['Deskripsi', 'Kuantitas', 'Harga', 'Jumlah']])
+    df_render.columns = ['Deskripsi', 'Kuantitas', 'price', 'discount', 'Jumlah', 'Harga', 'Diskon']
+    st.table(df_render[['Deskripsi', 'Kuantitas', 'Harga', 'Diskon', 'Jumlah']])
     
     if st.button("🗑️ Kosongkan Tabel"):
         st.session_state.invoice_items = []
         st.rerun()
 
-# Financial Summary Calculation
-subtotal = sum(item['qty'] * item['price'] for item in st.session_state.invoice_items)
+# Financial Summary Calculation (Total bersih setelah diskon)
+subtotal = sum(item['qty'] * (item['price'] - item['discount']) for item in st.session_state.invoice_items)
 
 # Kolom Down Payment
 dp_paid = st.number_input("Down Payment (Rp) - Isi 0 jika tanpa DP", min_value=0, value=0, step=50000)
@@ -117,13 +124,23 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             pass
 
         rows_html = ""
-        row_template = "<tr><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded;'>[DESC]</td><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: center;'>[QTY]</td><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[PRICE]</td><td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[TOTAL]</td></tr>"
+        row_template = (
+            "<tr>"
+            "<td style='padding: 12px 10px; border-bottom: 1px solid #eaeded;'>[DESC]</td>"
+            "<td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: center;'>[QTY]</td>"
+            "<td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[PRICE]</td>"
+            "<td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right; color: #e67e22;'>[DISCOUNT]</td>"
+            "<td style='padding: 12px 10px; border-bottom: 1px solid #eaeded; text-align: right;'>[TOTAL]</td>"
+            "</tr>"
+        )
         
         for item in st.session_state.invoice_items:
-            item_total = item['qty'] * item['price']
+            item_total = item['qty'] * (item['price'] - item['discount'])
             formatted_price = f"Rp {item['price']:,.0f}".replace(",", ".")
+            formatted_discount = f"Rp {item['discount']:,.0f}".replace(",", ".") if item['discount'] > 0 else "-"
             formatted_total = f"Rp {item_total:,.0f}".replace(",", ".")
-            rows_html += row_template.replace("[DESC]", str(item['desc'])).replace("[QTY]", str(item['qty'])).replace("[PRICE]", formatted_price).replace("[TOTAL]", formatted_total)
+            
+            rows_html += row_template.replace("[DESC]", str(item['desc'])).replace("[QTY]", str(item['qty'])).replace("[PRICE]", formatted_price).replace("[DISCOUNT]", formatted_discount).replace("[TOTAL]", formatted_total)
             
         event_info_html = f"<b>Kegiatan:</b> {event_date_time}<br>" if event_date_time else ""
         
@@ -136,7 +153,6 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
         else:
             status_badge_html = ""
             
-        # PENYESUAIAN POSISI: Nilai top diubah ke 150px agar logo bergeser lebih naik ke atas
         html_template = (
             "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Invoice #[INV_NUMBER]</title>"
             "<style>"
@@ -170,12 +186,12 @@ if st.button("🚀 Cetak Invoice Desain Baru", type="primary"):
             "</tr></table>"
             "<div class='table-container'>"
             "<div class='watermark-container'><img class='watermark' src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO.-06.png' onerror=\"this.src='https://raw.githubusercontent.com/fluiradventure-dev/fluir-invoice/main/FLUIR%20LOGO%201.webp'; this.style.opacity='0.05';\"></div>"
-            "<table class='items'><thead><tr><th style='text-align: left; width: 50%;'>Deskripsi</th><th style='width: 15%; text-align: center;'>Kuantitas</th><th style='width: 17%; text-align: right;'>Harga</th><th style='width: 18%; text-align: right;'>Jumlah</th></tr></thead>"
+            "<table class='items'><thead><tr><th style='text-align: left; width: 40%;'>Deskripsi</th><th style='width: 10%; text-align: center;'>Qty</th><th style='width: 16%; text-align: right;'>Harga</th><th style='width: 16%; text-align: right;'>Diskon</th><th style='width: 18%; text-align: right;'>Jumlah</th></tr></thead>"
             "<tbody>[ROWS_HTML]</tbody></table>"
             "</div>"
             "<div class='split-container'><div class='right-block'>"
             "<table class='summary-table'>"
-            "<tr><td style='text-align: left; color:#7f8c8d;'>Subtotal</td><td style='text-align: right;'>[SUBTOTAL]</td></tr>"
+            "<tr><td style='text-align: left; color:#7f8c8d;'>Total Bersih</td><td style='text-align: right;'>[SUBTOTAL]</td></tr>"
             "<tr><td style='text-align: left; color:#7f8c8d;'>Down Payment</td><td style='text-align: right; color: #27ae60;'>[DP_PAID]</td></tr>"
             "<tr style='font-weight: bold; background-color: #fcfcfc;'><td style='text-align: left; border-top: 1px solid #34495e;'>Sisa Pembayaran</td><td style='text-align: right; color: #c0392b; border-top: 1px solid #34495e;'>[REMAINING]</td></tr>"
             "</table>[STATUS_BADGE]"
